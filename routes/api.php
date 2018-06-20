@@ -18,10 +18,15 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 //===============UsersTypeRoutes======================
+// List all the userTypes
 Route::get('userTypes', 'UserTypeController@index');
+// List one userType
 Route::get('userType/{id}', 'UserTypeController@show');
+// create userType
 Route::post('userType', 'UserTypeController@store');
+// update userType
 Route::put('userType', 'UserTypeController@store');
+// delete userType
 Route::delete('userType/{id}', 'UserTypeController@destroy');
 
 //===============MealsRoutes======================
@@ -47,3 +52,16 @@ Route::post('/user/create', 'UserController@store');
 Route::put('/user', 'UserController@store');
 // delete user
 Route::delete('/user/{userId}', 'UserController@destroy');
+
+
+//===============OrdersRoutes======================
+// List all the orders
+Route::get('/orders','OrderController@all');
+// list one order
+Route::get('/order/{orderId}','OrderController@show');
+// create order
+Route::post('/order/create', 'OrderController@store');
+// update order
+Route::put('/order', 'OrderController@store');
+// delete order
+Route::delete('/order/{orderId}', 'OrderController@destroy');
