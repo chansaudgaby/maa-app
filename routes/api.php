@@ -16,3 +16,13 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+//===============MealsRoutes======================
+// List all the meals
+Route::get('/meals','MealController@all');
+// list one meal
+Route::get('/meal/{mealId}','MealController@show');
+// create meal
+Route::post('/meal/create', 'MealController@store');
+// update meal
+Route::put('/meal', 'MealController@store');
