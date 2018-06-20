@@ -65,3 +65,16 @@ Route::post('/order/create', 'OrderController@store');
 Route::put('/order', 'OrderController@store');
 // delete order
 Route::delete('/order/{orderId}', 'OrderController@destroy');
+
+
+//===============MenusRoutes======================
+// List all the menus
+Route::get('/menus','MenuController@all');
+// list one order
+Route::get('/menu/{menuId}','MenuController@show');
+// create menu
+Route::post('/menu/create', 'MenuController@store');
+// update menu
+Route::put('/menu', 'MenuController@store');
+// delete menu
+Route::delete('/menu/{menuId}', 'MenuController@destroy');
