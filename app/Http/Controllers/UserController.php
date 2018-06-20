@@ -91,8 +91,13 @@ class UserController extends Controller
 
     public function show($userId)
     {
-        $user = User::findOrFail($userId);
-        return Response::json($user);
+        $users = User::
+        join('user_types', 'user_types.id', '=', 'users.userstype_id')
+        ->select('users.id', 'users.lname as LastName','users.fname as FirstName' , 'user_types.name as type_user')
+        ->where('users.id','=',$userId)
+        ->get();
+ 
+        return Response::json($users);
     }
     
     public function store(Request $request)

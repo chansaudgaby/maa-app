@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Meal;
+use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
@@ -15,13 +16,27 @@ class MealController extends Controller
    public function all() 
    {
        $meals = Meal::select('id', 'name','quantity','picture','user_id')->paginate(25);
+       
+
+       foreach ($meals as $key=>$meal) {
+        $user = User::where('id','=',$meal->user_id)->select('fname as FirstName', 'lname as LastName')->get();
+        // dd($user);
+
+        $meals[$key]->user = $user;
+    }
+
        return Response::json($meals);
    }
 
    public function show($mealId)
    {
-       $meal = Meal::findOrFail($mealId);
-       return Response::json($meal);
+       $meals = Meal::
+       join('users', 'users.id', '=', 'meals.user_id')
+       ->select('meals.*', 'users.fname as FirstName','users.lname as LastName')
+       ->where('meals.id','=',$mealId)
+       ->get();
+
+       return Response::json($meals);
    }
    
    public function store(Request $request)
