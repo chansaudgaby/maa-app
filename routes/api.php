@@ -17,14 +17,13 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-<<<<<<< HEAD
-//Route UserTypes
+//===============UsersTypeRoutes======================
 Route::get('userTypes', 'UserTypeController@index');
 Route::get('userType/{id}', 'UserTypeController@show');
 Route::post('userType', 'UserTypeController@store');
 Route::put('userType', 'UserTypeController@store');
 Route::delete('userType/{id}', 'UserTypeController@destroy');
-=======
+
 //===============MealsRoutes======================
 // List all the meals
 Route::get('/meals','MealController@all');
@@ -36,4 +35,3 @@ Route::post('/meal/create', 'MealController@store');
 Route::put('/meal', 'MealController@store');
 // delete meal
 Route::delete('/meal/{mealId}', 'MealController@destroy');
->>>>>>> meals_entity
