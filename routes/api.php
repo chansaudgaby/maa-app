@@ -19,7 +19,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 //Route UserTypes
 Route::get('userTypes', 'UserTypeController@index');
-Route::get('userType /{id}', 'UserTypeController@show');
+Route::get('userType/{id}', 'UserTypeController@show');
 Route::post('userType', 'UserTypeController@store');
-Route::put('userTypes', 'UserTypeController@store');
-Route::delete('userTypes', 'UserTypeController@destroy');
+Route::put('userType', 'UserTypeController@store');
+Route::delete('userType/{id}', 'UserTypeController@destroy');

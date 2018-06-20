@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\UserType;
 use App\Http\Resources\UserType as UserTypeResource;
+
 use App\Http\Controllers\Controller;
 
 class UserTypeController extends Controller
@@ -30,7 +31,15 @@ class UserTypeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $userType = $request->isMethod('put') ? UserType::findOrFail
+        ($request->userType_id) : new UserType;
+
+        $userType->id = $request->input('userType_id');
+        $userType->name = $request->input('name');
+
+        if($userType->save()){
+            return new UserTypeResource($userType);
+        }
     }
 
     /**
@@ -41,7 +50,8 @@ class UserTypeController extends Controller
      */
     public function show($id)
     {
-        //
+        $userType = UserType::findOrFail($id);
+        return new UserTypeResource($userType);
     }
 
 
@@ -53,6 +63,11 @@ class UserTypeController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $userType = UserType::findOrFail($id);
+
+        if($userType->delete()) {
+            return new UserTypeResource($userType);
+        }
+        
     }
 }
