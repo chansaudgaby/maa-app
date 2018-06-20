@@ -12,7 +12,7 @@ class UserTypesTableSeeder extends Seeder
      */
     public function run()
     {
-        $type = ['traiteur','collaborateur','assistant'];
+        $type = ['Traiteur','Collaborateur','Assistant'];
         $userTypes = [];
 
         for($i = 0; $i < 3; $i++) :
