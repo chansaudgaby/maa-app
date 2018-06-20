@@ -35,3 +35,15 @@ Route::post('/meal/create', 'MealController@store');
 Route::put('/meal', 'MealController@store');
 // delete meal
 Route::delete('/meal/{mealId}', 'MealController@destroy');
+
+//===============MealsRoutes======================
+// List all the users
+Route::get('/users','UserController@all');
+// list one user
+Route::get('/user/{userId}','UserController@show');
+// create user
+Route::post('/user/create', 'UserController@store');
+// update user
+Route::put('/user', 'UserController@store');
+// delete user
+Route::delete('/user/{userId}', 'UserController@destroy');
