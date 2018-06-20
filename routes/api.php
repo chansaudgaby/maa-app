@@ -78,3 +78,5 @@ Route::post('/menu/create', 'MenuController@store');
 Route::put('/menu', 'MenuController@store');
 // delete menu
 Route::delete('/menu/{menuId}', 'MenuController@destroy');
+
+//===============TestTeremu======================
