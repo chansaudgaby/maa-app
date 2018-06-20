@@ -16,3 +16,10 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+//Route UserTypes
+Route::get('userTypes', 'UserTypeController@index');
+Route::get('userType/{id}', 'UserTypeController@show');
+Route::post('userType', 'UserTypeController@store');
+Route::put('userType', 'UserTypeController@store');
+Route::delete('userType/{id}', 'UserTypeController@destroy');
