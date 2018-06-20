@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use App\Usertype;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
@@ -75,7 +76,17 @@ class UserController extends Controller
     public function all()
     {
         $users = User::select('id', 'lname','fname','email','userstype_id')->paginate(25);
+
+        
+
+        foreach ($users as $key=>$user) {
+            $userstype = Usertype::find($user->userstype_id);
+
+            $users[$key]->userstype = $userstype->name;
+        }
+
         return Response::json($users);
+
     }
 
     public function show($userId)
