@@ -51,6 +51,10 @@ Route::group(['middleware' => 'auth:api'], function(){
     //===============MealsRoutes======================
     // List all the meals
     Route::get('/meals','MealController@all');
+    // List one 'traiteur" meals, only for "traiteur"
+    Route::get('/traiteur/myMeals','MealController@myMeals');
+    // list the meals of one "traiteur"
+    Route::get('/traiteur/{traiteurId}','MealController@mealsByTraiteur');
     // list one meal
     Route::get('/meal/{mealId}','MealController@show');
     // create meal

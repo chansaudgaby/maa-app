@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Auth; 
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\Meal as MealR;
 
@@ -15,17 +16,49 @@ class MealController extends Controller
 {
    public function all() 
    {
-       $meals = Meal::select('id', 'name','quantity','picture','user_id')->paginate(25);
-       
+        $userTypeId = Auth::user()->userstype_id;
+        //====Si l'utilisateur est un traiteur alors
+        if($userTypeId == 2):
+            $meals = Meal::select('id', 'name','quantity','picture','user_id')->paginate(25);
+            foreach ($meals as $key=>$meal):
+                $user = User::where('id','=',$meal->user_id)
+                ->select('fname as FirstName', 'lname as LastName')
+                ->get();
+                $meals[$key]->user = $user;
+            endforeach;
+        return Response::json($meals);
+        else:
+            return Response::json(['error'=>'accès non autorisé']);
+        endif;
+   }
 
-       foreach ($meals as $key=>$meal) {
-        $user = User::where('id','=',$meal->user_id)->select('fname as FirstName', 'lname as LastName')->get();
-        // dd($user);
+   public function myMeals()
+   {
+        $userId = Auth::user()->id;
+        $meals = Meal::select('id', 'name','quantity','picture','user_id')
+                        ->where('meals.user_id', '=', $userId)
+                        ->paginate(25);
 
-        $meals[$key]->user = $user;
-    }
+        foreach ($meals as $key=>$meal):
+            $user = User::where('id','=',$meal->user_id)->select('fname as FirstName', 'lname as LastName')->get();
+            $meals[$key]->user = $user;
+        endforeach;
 
-       return Response::json($meals);
+        return Response::json($meals);
+   }
+   
+   public function mealsByTraiteur($traiteurId)
+   {
+        $meals = Meal::select('id', 'name','quantity','picture','user_id')
+                        ->where('meals.user_id', '=', $traiteurId)
+                        ->paginate(25);
+
+        foreach ($meals as $key=>$meal):
+            $user = User::where('id','=',$meal->user_id)->select('fname as FirstName', 'lname as LastName')->get();
+            $meals[$key]->user = $user;
+        endforeach;
+
+        return Response::json($meals);
    }
 
    public function show($mealId)

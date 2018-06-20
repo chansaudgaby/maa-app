@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Order;
+use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
@@ -15,7 +16,19 @@ class OrderController extends Controller
     public function all()
     {
         $orders = Order::select('id','name','user_id','menu_id')->paginate(25);
+
+        foreach ($orders as $key=>$order) {
+        $user = 
+            User::where('id','=',$order->user_id)
+            ->join('menu', 'menu.id', '=' , 'order.menu_id')
+            ->select('fname as FirstName', 'lname as LastName')->get();
+        // dd($user);
+
+        $orders[$key]->user = $user;
+    }
+
         return Response::json($orders);
+       
     }
 
     public function show($orderId)
