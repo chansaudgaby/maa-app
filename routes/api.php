@@ -26,3 +26,5 @@ Route::get('/meal/{mealId}','MealController@show');
 Route::post('/meal/create', 'MealController@store');
 // update meal
 Route::put('/meal', 'MealController@store');
+// delete meal
+Route::delete('/meal/{mealId}', 'MealController@destroy');

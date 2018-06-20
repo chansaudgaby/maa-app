@@ -24,4 +24,26 @@ class MealController extends Controller
        return Response::json($meal);
    }
    
+   public function store(Request $request)
+   {
+       $meal = $request->isMethod('put') ? Meal::findOrFail($request->meal_id) : new Meal;
+
+       $meal->id = $request->input('meal_id');
+       $meal->name = $request->input('name');
+       $meal->quantity = $request->input('quantity');
+       $meal->picture = $request->input('picture');
+       $meal->user_id = $request->input('user_id');
+
+       if($meal->save()):
+           return new MealR($meal);
+       endif;
+   }
+
+   public function destroy($mealId)
+   {
+       $meals = Meal::findOrFail($mealId);
+       if($meals->delete()):
+           return new MealR($meals);
+       endif;
+       }
 }
