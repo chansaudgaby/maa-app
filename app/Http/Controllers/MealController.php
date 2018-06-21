@@ -22,7 +22,7 @@ class MealController extends Controller
             $meals = Meal::select('id', 'name','quantity','picture','user_id')->paginate(25);
             foreach ($meals as $key=>$meal):
                 $user = User::where('id','=',$meal->user_id)
-                ->select('fname as FirstName', 'lname as LastName')
+                ->select('fname as TraiteurFName', 'lname as TraiteurLName')
                 ->get();
                 $meals[$key]->user = $user;
             endforeach;
@@ -40,7 +40,9 @@ class MealController extends Controller
                         ->paginate(25);
 
         foreach ($meals as $key=>$meal):
-            $user = User::where('id','=',$meal->user_id)->select('fname as FirstName', 'lname as LastName')->get();
+            $user = User::where('id','=',$meal->user_id)
+            ->select('fname as TraiteurFName', 'lname as TraiteurLName')
+            ->get();
             $meals[$key]->user = $user;
         endforeach;
 
@@ -54,7 +56,9 @@ class MealController extends Controller
                         ->paginate(25);
 
         foreach ($meals as $key=>$meal):
-            $user = User::where('id','=',$meal->user_id)->select('fname as FirstName', 'lname as LastName')->get();
+            $user = User::where('id','=',$meal->user_id)
+            ->select('fname as TraiteurFName', 'lname as TraiteurLName')
+            ->get();
             $meals[$key]->user = $user;
         endforeach;
 

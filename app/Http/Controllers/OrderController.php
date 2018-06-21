@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Auth; 
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\Order as OrderR;
 
@@ -15,13 +16,38 @@ class OrderController extends Controller
 {
     public function all()
     {
-        $orders = Order::select('id','name','user_id','menu_id')->paginate(25);
+        $userTypeId = Auth::user()->userstype_id;
+        if($userTypeId == 1):
+            $orders = Order::select('id','name','user_id','menu_id')->paginate(25);
+
+            foreach ($orders as $key=>$order) {
+            $user = 
+                User::where('id','=',$order->user_id)
+                ->select('fname as FirstName', 'lname as LastName')->get();
+            // dd($user);
+
+            $orders[$key]->user = $user;
+        }
+
+            return Response::json($orders);
+        else:
+            return Response::json(['error'=>'accès non autorisé']);
+        endif;
+       
+    }
+
+    public function myOrders()
+    {
+        $userId = Auth::User()->id;
+        // dd($userId);
+
+        $orders = Order::select('id','name','user_id','menu_id')
+                        ->where('orders.user_id' , '=' , $userId)
+                        ->paginate(25);
 
         foreach ($orders as $key=>$order) {
-        $user = 
-            User::where('id','=',$order->user_id)
-            ->join('menu', 'menu.id', '=' , 'order.menu_id')
-            ->select('fname as FirstName', 'lname as LastName')->get();
+        $user = User::where('id','=',$order->user_id)
+                    ->select('fname as FirstName', 'lname as LastName')->get();
         // dd($user);
 
         $orders[$key]->user = $user;
@@ -39,11 +65,13 @@ class OrderController extends Controller
    
     public function store(Request $request)
     {
+        $userId = Auth::User()->id;
+
         $order = $request->isMethod('put') ? Order::findOrFail($request->order_id) : new Order;
  
         $order->id = $request->input('order_id');
         $order->name = $request->input('name');
-        $order->user_id = $request->input('user_id');
+        $order->user_id = $userId;
         $order->menu_id = $request->input('menu_id');
  
         if($order->save()):

@@ -68,6 +68,7 @@ Route::group(['middleware' => 'auth:api'], function(){
     //===============OrdersRoutes======================
     // List all the orders
     Route::get('/orders','OrderController@all');
+    Route::get('/myOrders','OrderController@myOrders');
     // list one order
     Route::get('/order/{orderId}','OrderController@show');
     // create order
