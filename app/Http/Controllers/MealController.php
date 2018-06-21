@@ -78,13 +78,14 @@ class MealController extends Controller
    
    public function store(Request $request)
    {
-       $meal = $request->isMethod('put') ? Meal::findOrFail($request->meal_id) : new Meal;
+        $userId = Auth::user()->id;
+        $meal = $request->isMethod('put') ? Meal::findOrFail($request->meal_id) : new Meal;
 
        $meal->id = $request->input('meal_id');
        $meal->name = $request->input('name');
        $meal->quantity = $request->input('quantity');
        $meal->picture = $request->input('picture');
-       $meal->user_id = $request->input('user_id');
+       $meal->user_id = $userId;
 
        if($meal->save()):
            return new MealR($meal);
@@ -92,10 +93,18 @@ class MealController extends Controller
    }
 
    public function destroy($mealId)
-   {
-       $meals = Meal::findOrFail($mealId);
-       if($meals->delete()):
-           return new MealR($meals);
-       endif;
-       }
+    {
+        $meals = Meal::findOrFail($mealId);
+    
+        $userId = Auth::User()->id;
+        $userTypeId = Auth::User()->userstype_id;
+        if(($userTypeId == 3) || ($userTypeId == 1)):
+            if($meals->delete()):
+                return new MealR($meals);
+            endif;
+        else:
+            return Response::json(['error'=>'accès non autorisé']);
+        endif;
+    }
+
 }

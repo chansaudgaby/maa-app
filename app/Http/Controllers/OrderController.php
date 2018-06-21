@@ -17,6 +17,7 @@ class OrderController extends Controller
     public function all()
     {
         $userTypeId = Auth::user()->userstype_id;
+        // dd(($userTypeId));
         if(($userTypeId == 1) || ($userTypeId == 3)):
             $orders = Order::select('id','name','user_id','menu_id')->paginate(25);
 
@@ -82,10 +83,22 @@ class OrderController extends Controller
     public function destroy($orderId)
     {
         $order = Order::findOrFail($orderId);
-        if($order->delete()):
-            return new OrderR($order);
+        $userId = Auth::User()->id;
+        $userTypeId = Auth::User()->userstype_id;
+        if($userTypeId == 3):
+            if($order->delete()):
+                return new OrderR($order);
+            endif;
         endif;
-        }
+        
+        if($userId == $order->user_id):
+            if($order->delete()):
+                return new OrderR($order);
+            endif;
+        else:
+            return Response::json(['error'=>'accès non autorisé']);
+        endif;
+    }
 
 
 }
