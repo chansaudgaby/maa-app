@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Menu;
+use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Auth; 
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\Menu as MenuR;
 
@@ -14,7 +16,16 @@ class MenuController extends Controller
 {
     public function all()
     {
+        
         $menus = Menu::select('id','user_id','meal_id')->paginate(25);
+
+        foreach ($menus as $key=>$menu) {
+            $user = Menu::join('users', 'users.id' , '=' , 'menus.user_id')
+                        ->select('users.fname as FirstName', 'users.lname as LastName')
+                        ->where('menus.id', '=' , $menu->id)
+                        ->get();
+            $menus[$key]->user = $user;
+        }
         return Response::json($menus);
     }
 

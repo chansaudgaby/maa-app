@@ -17,7 +17,7 @@ class OrderController extends Controller
     public function all()
     {
         $userTypeId = Auth::user()->userstype_id;
-        if($userTypeId == 1):
+        if(($userTypeId == 1) || ($userTypeId == 3)):
             $orders = Order::select('id','name','user_id','menu_id')->paginate(25);
 
             foreach ($orders as $key=>$order) {
