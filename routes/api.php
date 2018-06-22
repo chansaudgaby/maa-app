@@ -68,6 +68,7 @@ Route::group(['middleware' => 'auth:api'], function(){
     //===============OrdersRoutes======================
     // List all the orders
     Route::get('/orders','OrderController@all');
+    // Liste mes commandes
     Route::get('/myOrders','OrderController@myOrders');
     // list one order
     Route::get('/order/{orderId}','OrderController@show');
@@ -83,6 +84,14 @@ Route::group(['middleware' => 'auth:api'], function(){
     // List all the menus
         
     Route::get('/menus','MenuController@all');
+    // list one order
+    Route::get('/menuOfToday','MenuController@menuOfToday');
+    // list one order
+    Route::get('/myMenus','MenuController@myMenus');
+    // list one order
+    Route::get('/menus/traiteur/{idTraiteur}','MenuController@menuByTraiteur');
+    // list one order
+    Route::get('/menuFrom/{dd}-{mm}-{yyyy}','MenuController@menuOfTheWeek');
     // list one order
     Route::get('/menu/{menuId}','MenuController@show');
     // create menu
