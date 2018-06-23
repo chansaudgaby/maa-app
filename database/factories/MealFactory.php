@@ -23,8 +23,7 @@ $factory->define(App\Meal::class, function (Faker $faker) {
     return [
        
         'name' => $mealName[$faker->numberBetween(0,7)],
-        'quantity' => $faker->numberBetween(1,7),
-        'user_id' => $faker->numberBetween(1,3),
+        'user_id' => 1,
         'picture' => $mealPicture[$faker->numberBetween(0,1)],
         
     ];

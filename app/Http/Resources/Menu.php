@@ -18,6 +18,8 @@ class Menu extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'meal_id' => $this->meal_id,
+            'quantity' => $this->quantity,
+            'orders' => $this->orders,
             'date' => $this->date,
         ];
     }

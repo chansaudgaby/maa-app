@@ -17,6 +17,8 @@ class CreateMenusTable extends Migration
             $table->increments('id');
             $table->integer('meal_id');
             $table->integer('user_id');
+            $table->integer('quantity');
+            $table->integer('orders')->default(0);
             $table->date('date');
             $table->timestamps();
         });

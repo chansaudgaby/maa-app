@@ -18,7 +18,7 @@ class OrderController extends Controller
     {
         $userTypeId = Auth::user()->userstype_id;
         if(($userTypeId == 1) || ($userTypeId == 3)):
-            $orders = Order::select('id','name','user_id','menu_id')->paginate(25);
+            $orders = Order::select('id','name','user_id','menu_id', 'quantity')->paginate(25);
 
             foreach ($orders as $key=>$order) {
             $user = 
@@ -41,7 +41,7 @@ class OrderController extends Controller
         $userId = Auth::User()->id;
         // dd($userId);
 
-        $orders = Order::select('id','name','user_id','menu_id')
+        $orders = Order::select('id','name','user_id','menu_id', 'quantity')
                         ->where('orders.user_id' , '=' , $userId)
                         ->paginate(25);
 
@@ -73,9 +73,15 @@ class OrderController extends Controller
         $order->name = $request->input('name');
         $order->user_id = $userId;
         $order->menu_id = $request->input('menu_id');
+        $order->quantity = $request->input('quantity');
  
         if($order->save()):
+            DB::table('menus')
+            ->where('id', $order->menu_id)
+            ->increment('orders', $order->quantity);
             return new OrderR($order);
+        else:
+            return Response::json(['error'=>'il n/y a plus de plats de libre']);
         endif;
     }
  

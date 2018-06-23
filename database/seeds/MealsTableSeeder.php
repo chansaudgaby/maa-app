@@ -11,6 +11,6 @@ class MealsTableSeeder extends Seeder
      */
     public function run()
     {
-        factory('App\Meal', 30)->create();
+        factory('App\Meal', 10)->create();
     }
 }

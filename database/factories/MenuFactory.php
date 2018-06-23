@@ -15,12 +15,12 @@ $factory->define(App\Menu::class, function (Faker $faker) {
         '2018-07-18',
         '2018-07-20',
         '2018-07-19'
-
     ];
 
     return [
-        "user_id" => $faker->numberBetween(1,3),
-        "meal_id" => $faker->numberBetween(1,17),
+        "user_id" => 1,
+        "meal_id" => $faker->numberBetween(1,5),
+        'quantity' => $faker->numberBetween(1,2),
         "date"=>$datePerso[$faker->numberBetween(0,7)],
     ];
 });
