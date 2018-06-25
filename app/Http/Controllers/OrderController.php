@@ -76,12 +76,14 @@ class OrderController extends Controller
         $order->quantity = $request->input('quantity');
  
         if($order->save()):
+
+            // $menus = Menu::all();
+            // $dd($menus->orders);
             DB::table('menus')
             ->where('id', $order->menu_id)
             ->increment('orders', $order->quantity);
             return new OrderR($order);
         else:
-            return Response::json(['error'=>'il n/y a plus de plats de libre']);
         endif;
     }
  

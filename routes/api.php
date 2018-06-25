@@ -64,7 +64,6 @@ Route::group(['middleware' => 'auth:api'], function(){
     // delete meal
     Route::delete('/meal/{mealId}', 'MealController@destroy');
 
-
     //===============OrdersRoutes======================
     // List all the orders
     Route::get('/orders','OrderController@all');
@@ -78,7 +77,6 @@ Route::group(['middleware' => 'auth:api'], function(){
     Route::put('/order', 'OrderController@store');
     // delete order
     Route::delete('/order/{orderId}', 'OrderController@destroy');
-
 
     //===============MenusRoutes======================
     // List all the menus
@@ -100,7 +98,6 @@ Route::group(['middleware' => 'auth:api'], function(){
     // delete menu
     Route::delete('/menu/{menuId}', 'MenuController@destroy');
 
-    
     // list one order
     // Route::get('/menuOfToday','MenuController@menuOfToday');
 });
