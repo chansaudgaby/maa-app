@@ -27,11 +27,11 @@ class MenuController extends Controller
             ->where('user_id', $userId)
             ->paginate(25);
             foreach ($menus as $key=>$menu):
-                $user = User::where('id','=',$menu->user_id)->select('fname as FirstName', 'lname as LastName')->get();
+                $user = User::where('id','=',$menu->traiteur_id)->select('fname as FirstName', 'lname as LastName')->get();
                 $menus[$key]->user = $user; 
             endforeach;
             foreach ($menus as $key=>$menu):
-                $meal = Meal::where('id','=',$menu->meal_id)->select('name','user_id as traiteur_id','picture')->get();
+                $meal = Meal::where('id','=',$menu->traiteur_id)->select('name','user_id as traiteur_id','picture')->get();
                     $menus[$key]->meal = $meal;
             endforeach;
             return Response::json($menus);
@@ -67,9 +67,10 @@ class MenuController extends Controller
         $userTypeId = Auth::user()->userstype_id;
         //====Si l'utilisateur est un collab ou assistante alors
         if(($userTypeId == 2) || ($userTypeId == 3)):
-            $menus = Menu::select('id','user_id as traiteur_id','meal_id','date', 'quantity')->paginate(25);
+            $menus = Menu::select('id','user_id as traiteur_id','meal_id','date', 'quantity')
+            ->whereColumn('quantity', '!=', 'orders')->paginate(25);
             foreach ($menus as $key=>$menu):
-                $user = User::where('id','=',$menu->user_id)->select('fname as FirstName', 'lname as LastName')->get();
+                $user = User::where('id','=',$menu->traiteur_id)->select('fname as FirstName', 'lname as LastName')->get();
                 $menus[$key]->user = $user; 
             endforeach;
             foreach ($menus as $key=>$menu):
@@ -93,7 +94,7 @@ class MenuController extends Controller
             ->paginate(25);
 
             foreach ($menus as $key=>$menu):
-                $user = User::where('id','=',$menu->user_id)->select('fname as FirstName', 'lname as LastName')->get();
+                $user = User::where('id','=',$menu->traiteur_id)->select('fname as FirstName', 'lname as LastName')->get();
                 $menus[$key]->user = $user; 
             endforeach;
             foreach ($menus as $key=>$menu):

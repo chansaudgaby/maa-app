@@ -19,7 +19,6 @@ class Meal extends JsonResource
             'name' => $this->name,
             'user_id' => $this->user_id,
             'picture' => $this->picture,
-            'quantity' => $this->quantity
         ];
     }
 }

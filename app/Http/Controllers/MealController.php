@@ -18,8 +18,8 @@ class MealController extends Controller
    {
         $userTypeId = Auth::user()->userstype_id;
         //====Si l'utilisateur est un traiteur alors
-        if($userTypeId == 2):
-            $meals = Meal::select('id', 'name','quantity','picture','user_id')->paginate(25);
+        if($userTypeId == 1):
+            $meals = Meal::select('id', 'name','picture','user_id')->paginate(25);
             foreach ($meals as $key=>$meal):
                 $user = User::where('id','=',$meal->user_id)
                 ->select('fname as TraiteurFName', 'lname as TraiteurLName')
@@ -78,24 +78,71 @@ class MealController extends Controller
    
    public function store(Request $request)
    {
-       $meal = $request->isMethod('put') ? Meal::findOrFail($request->meal_id) : new Meal;
+    $userTypeId = Auth::user()->userstype_id;
+        if($userTypeId == 1):
+            $userId = Auth::user()->id;
+            $meal = $request->isMethod('put') ? Meal::findOrFail($request->meal_id) : new Meal;
 
-       $meal->id = $request->input('meal_id');
-       $meal->name = $request->input('name');
-       $meal->quantity = $request->input('quantity');
-       $meal->picture = $request->input('picture');
-       $meal->user_id = $request->input('user_id');
+            $meal->id = $request->input('meal_id');
+            $meal->name = $request->input('name');
+            $meal->picture = $request->input('picture');
+            $meal->user_id = $userId;
 
-       if($meal->save()):
-           return new MealR($meal);
-       endif;
+            if($meal->save()):
+                return new MealR($meal);
+            endif;
+        else: 
+            return Response::json(['error'=>'accès non autorisé']);
+        endif;
    }
 
    public function destroy($mealId)
    {
-       $meals = Meal::findOrFail($mealId);
-       if($meals->delete()):
-           return new MealR($meals);
-       endif;
-       }
+    $userId = Auth::user()->id;
+    $userTypeId = Auth::user()->userstype_id;
+       $meals = Meal::select('id','user_id','name','picture')->where('id', $mealId)->get()->first();
+    //    dd($meals);
+    
+    if($userTypeId == 1):
+        if($meals->user_id = $userId):
+            if($meals->delete()):
+                return new MealR($meals);
+            endif;
+        else:
+            return Response::json(['error'=>'accès non autorisé']);
+        endif;
+    endif;
+
+    }
+
+    public function uploadPicture(Request $request)
+    {
+        
+        $userTypeId = Auth::user()->userstype_id;
+        // dd($request->file('picture'));
+        
+        if($userTypeId == 1):
+            if($request->input('meal_id')):
+                if($request->hasfile('picture')):
+                    
+                    $file = $request->file('picture');
+                    $extension = $file->getClientOriginalExtension(); // getting image extension
+                    $filename =substr( md5( Auth::user()->id . '-' . time() ), 0, 15).'.'.$extension;
+
+                    $file->move('images', $filename);
+
+                    $meal = Meal::findOrFail($request->input('meal_id'));
+                    $meal->picture = $filename;
+                    $meal->save();
+                    
+                return new MealR($meal);
+
+                endif;
+            endif;
+        endif;
+
+                
+
+
+    }
 }

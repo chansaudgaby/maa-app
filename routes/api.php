@@ -58,6 +58,8 @@ Route::group(['middleware' => 'auth:api'], function(){
     // list one meal
     Route::get('/meal/{mealId}','MealController@show');
     // create meal
+    Route::post('/meal/uploadPicture','MealController@uploadPicture');
+    // create meal
     Route::post('/meal/create', 'MealController@store');
     // update meal
     Route::put('/meal', 'MealController@store');
@@ -72,9 +74,9 @@ Route::group(['middleware' => 'auth:api'], function(){
     // list one order
     Route::get('/order/{orderId}','OrderController@show');
     // create order
-    Route::post('/order/create', 'OrderController@store');
+    Route::post('/order/create', 'OrderController@storage');
     // update order
-    Route::put('/order', 'OrderController@store');
+    Route::put('/order', 'OrderController@storage');
     // delete order
     Route::delete('/order/{orderId}', 'OrderController@destroy');
 

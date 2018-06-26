@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Order;
+use App\Menu;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -48,8 +49,7 @@ class OrderController extends Controller
         foreach ($orders as $key=>$order) {
         $user = User::where('id','=',$order->user_id)
                     ->select('fname as FirstName', 'lname as LastName')->get();
-        // dd($user);
-
+                    
         $orders[$key]->user = $user;
     }
 
@@ -59,34 +59,69 @@ class OrderController extends Controller
 
     public function show($orderId)
     {
-        $order = Order::findOrFail($orderId);
+        $orders = Order::select('id', 'name', 'user_id', 'menu_id', 'quantity')
+            ->where('id', $orderId)
+            ->get();
+
+            foreach ($orders as $key=>$order) {
+                $user = User::where('id','=',$order->user_id)
+                            ->select('fname as FirstName', 'lname as LastName')->get();
+                // dd($user);
+        
+                $orders[$key]->user = $user;
+            }
         return Response::json($order);
+        
     }
-   
-    public function store(Request $request)
+
+    public function storage(Request $request)
     {
-        $userId = Auth::User()->id;
+        $input = $request->all();
+        dd($input);
+        $userId = Auth::user()->id;
+        $userTypeId = Auth::user()->userstype_id;
+            if($userTypeId == 2):
+                if($request->isMethod('put')):
+                    $order = Order::where([
+                        [ 'id', '=', $input['order_id']],
+                        [ 'menu_id', '=', $input['menu_id']],
+                        [ 'user_id', '=', $userId]
+                        ])->get()->first();
+                        // dd($order);
+            
+                    if(!empty($order)):
+                        $diff = $request->input('quantity')-$order->quantity;
+                        $order->menu_id = $input['menu_id'];
+                        $order->quantity = $input['quantity'];
+                        // dd($diff);
+                        if($order->save()):
+                            $menu = DB::table('menus')
+                                ->where('id', $input['menu_id']);
 
-        $order = $request->isMethod('put') ? Order::findOrFail($request->order_id) : new Order;
- 
-        $order->id = $request->input('order_id');
-        $order->name = $request->input('name');
-        $order->user_id = $userId;
-        $order->menu_id = $request->input('menu_id');
-        $order->quantity = $request->input('quantity');
- 
-        if($order->save()):
+                            if($diff >= 0):
+                                $menu->increment('orders', $diff);
+                            else:
+                                $menu->decrement('orders', abs($diff));
+                            endif;
 
-            // $menus = Menu::all();
-            // $dd($menus->orders);
-            DB::table('menus')
-            ->where('id', $order->menu_id)
-            ->increment('orders', $order->quantity);
-            return new OrderR($order);
-        else:
-        endif;
+                            return new OrderR($order);
+                        endif;
+                    else:
+                        return Response::json(['error'=>'error ici']);
+                    endif;
+                else:
+                    $input['user_id'] = $userId;
+                        $menu = Order::create($input);
+                            DB::table('menus')
+                            ->where('id', $input['menu_id'])
+                            ->increment('orders', $input['quantity']);
+                        return new OrderR($menu);
+                endif;
+            else:                
+                return Response::json(['error'=>'Vous ne pouvez pas creer de menu']);
+            endif;
     }
- 
+
     public function destroy($orderId)
     {
         $order = Order::findOrFail($orderId);
