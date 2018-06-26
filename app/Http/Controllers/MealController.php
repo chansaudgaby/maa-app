@@ -35,16 +35,16 @@ class MealController extends Controller
    public function myMeals()
    {
         $userId = Auth::user()->id;
-        $meals = Meal::select('id', 'name','picture','user_id')
+        $meals = Meal::select('id', 'name','picture')
                         ->where('meals.user_id', '=', $userId)
                         ->paginate(25);
 
-        foreach ($meals as $key=>$meal):
-            $user = User::where('id','=',$meal->user_id)
-            ->select('fname as TraiteurFName', 'lname as TraiteurLName')
-            ->get();
-            $meals[$key]->user = $user;
-        endforeach;
+        // foreach ($meals as $key=>$meal):
+        //     $user = User::where('id','=',$meal->user_id)
+        //     ->select('fname as TraiteurFName', 'lname as TraiteurLName')
+        //     ->get();
+        //     $meals[$key]->user = $user;
+        // endforeach;
 
         return Response::json($meals);
    }
