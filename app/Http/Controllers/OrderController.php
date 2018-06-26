@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Order;
 use App\Menu;
+use App\Meal;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -18,7 +19,7 @@ class OrderController extends Controller
     public function all()
     {
         $userTypeId = Auth::user()->userstype_id;
-        if(($userTypeId == 1) || ($userTypeId == 3)):
+        if($userTypeId == 3):
             $orders = Order::select('id','name','user_id','menu_id', 'quantity')->paginate(25);
 
             foreach ($orders as $key=>$order) {
@@ -29,6 +30,16 @@ class OrderController extends Controller
 
             $orders[$key]->user = $user;
         }
+
+        foreach ($orders as $key=>$order):
+            $menu = Menu::select('meals.name','meal_id')
+            ->join('meals', 'meals.id', 'menus.meal_id')
+            ->where('menus.id','=',$order->menu_id)
+            ->get();
+            $orders[$key]->menu = $menu;
+        endforeach;
+
+        
 
             return Response::json($orders);
         else:
@@ -46,12 +57,22 @@ class OrderController extends Controller
                         ->where('orders.user_id' , '=' , $userId)
                         ->paginate(25);
 
-        foreach ($orders as $key=>$order) {
+        foreach ($orders as $key=>$order):
         $user = User::where('id','=',$order->user_id)
                     ->select('fname as FirstName', 'lname as LastName')->get();
-                    
         $orders[$key]->user = $user;
-    }
+        endforeach;
+        
+        
+
+        foreach ($orders as $key=>$order):
+            $menu = Menu::select('meals.name','meal_id')
+            ->join('meals', 'meals.id', 'menus.meal_id')
+            ->where('menus.id','=',$order->menu_id)
+            ->get();
+            $orders[$key]->menu = $menu;
+        endforeach;
+            
 
         return Response::json($orders);
        
@@ -77,9 +98,10 @@ class OrderController extends Controller
     public function storage(Request $request)
     {
         $input = $request->all();
-        dd($input);
+        // dd($input);
         $userId = Auth::user()->id;
         $userTypeId = Auth::user()->userstype_id;
+        // dd($userTypeId);
             if($userTypeId == 2):
                 if($request->isMethod('put')):
                     $order = Order::where([

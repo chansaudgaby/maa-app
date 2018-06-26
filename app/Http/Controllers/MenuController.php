@@ -253,20 +253,20 @@ class MenuController extends Controller
         $userId = Auth::user()->id;
         $fromDate = Carbon::createFromDate($yyyy, $mm, $dd);
         $stringFromDate = Carbon::Parse($fromDate)->format('Y-m-d');
+        // dd($stringFromDate);
 
-        if($userTypeId == 1):
+        if(($userTypeId == 2) || ($userTypeId == 3)):
             $menus = Menu::select('id','user_id','meal_id','date', 'quantity', 'orders')
                 ->where([
                         ['date', $stringFromDate],
-                        ['user_id', $userId]
                 ])->get();
                 foreach ($menus as $key=>$menu):
                     $meal = Meal::where('id','=',$menu->meal_id)->select('name', 'picture')->get();
                         $menus[$key]->meal = $meal;
                 endforeach;
+                return Response::json($menus);
             else:
                 return Response::json(['error'=>'Nope']);
         endif;
-        return Response::json($menus);
     }
 }

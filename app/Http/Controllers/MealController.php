@@ -35,7 +35,7 @@ class MealController extends Controller
    public function myMeals()
    {
         $userId = Auth::user()->id;
-        $meals = Meal::select('id', 'name','quantity','picture','user_id')
+        $meals = Meal::select('id', 'name','picture','user_id')
                         ->where('meals.user_id', '=', $userId)
                         ->paginate(25);
 
@@ -51,29 +51,46 @@ class MealController extends Controller
    
    public function mealsByTraiteur($traiteurId)
    {
-        $meals = Meal::select('id', 'name','quantity','picture','user_id')
-                        ->where('meals.user_id', '=', $traiteurId)
-                        ->paginate(25);
+        $userTypeId = Auth::user()->userstype_id;
+        if($userTypeId == 3):
+            $meals = Meal::select('id', 'name','picture','user_id')
+                            ->where('meals.user_id', '=', $traiteurId)
+                            ->paginate(25);
 
-        foreach ($meals as $key=>$meal):
-            $user = User::where('id','=',$meal->user_id)
-            ->select('fname as TraiteurFName', 'lname as TraiteurLName')
-            ->get();
-            $meals[$key]->user = $user;
-        endforeach;
-
-        return Response::json($meals);
+            foreach ($meals as $key=>$meal):
+                $user = User::where('id','=',$meal->user_id)
+                ->select('fname as TraiteurFName', 'lname as TraiteurLName')
+                ->get();
+                $meals[$key]->user = $user;
+            endforeach;
+            return Response::json($meals);
+        else:
+            return Response::json(['error'=>'accès non autorisé']);
+        endif;
    }
 
    public function show($mealId)
    {
-       $meals = Meal::
-       join('users', 'users.id', '=', 'meals.user_id')
-       ->select('meals.*', 'users.fname as FirstName','users.lname as LastName')
-       ->where('meals.id','=',$mealId)
-       ->get();
+    $userId = Auth::user()->id;
+    $userTypeId = Auth::user()->userstype_id;
+    if(($userTypeId == 1) || ($userTypeId == 3)):
+        $meals = Meal::select('id', 'name','picture','user_id')
+        ->where('meals.id', '=', $mealId)
+        ->get()->first();
+        // dd($meals);
 
-       return Response::json($meals);
+            $user = User::where('id','=',$meals->user_id)
+            ->select('fname as TraiteurFName', 'lname as TraiteurLName')
+            ->get()->first();
+
+        if(($meals->user_id == $userId) || ($userTypeId == 3)):
+            return Response::json($meals);
+        else:
+            return Response::json(['error'=>'ce plat ne vous appartient pas']);
+        endif;
+    else:
+        return Response::json(['error'=>'accès non autorisé']);
+    endif;
    }
    
    public function store(Request $request)
@@ -103,8 +120,8 @@ class MealController extends Controller
        $meals = Meal::select('id','user_id','name','picture')->where('id', $mealId)->get()->first();
     //    dd($meals);
     
-    if($userTypeId == 1):
-        if($meals->user_id = $userId):
+    if(($userTypeId == 1) || ($userTypeId == 3)):
+        if(($meals->user_id == $userId || ($userTypeId == 3)) ):
             if($meals->delete()):
                 return new MealR($meals);
             endif;
