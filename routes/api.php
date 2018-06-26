@@ -102,4 +102,5 @@ Route::group(['middleware' => 'auth:api'], function(){
 
     // list one order
     // Route::get('/menuOfToday','MenuController@menuOfToday');
+//test
 });
