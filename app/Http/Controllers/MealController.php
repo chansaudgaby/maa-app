@@ -35,16 +35,16 @@ class MealController extends Controller
    public function myMeals()
    {
         $userId = Auth::user()->id;
-        $meals = Meal::select('id', 'name','picture','user_id')
+        $meals = Meal::select('id', 'name','picture')
                         ->where('meals.user_id', '=', $userId)
                         ->paginate(25);
 
-        foreach ($meals as $key=>$meal):
-            $user = User::where('id','=',$meal->user_id)
-            ->select('fname as TraiteurFName', 'lname as TraiteurLName')
-            ->get();
-            $meals[$key]->user = $user;
-        endforeach;
+        // foreach ($meals as $key=>$meal):
+        //     $user = User::where('id','=',$meal->user_id)
+        //     ->select('fname as TraiteurFName', 'lname as TraiteurLName')
+        //     ->get();
+        //     $meals[$key]->user = $user;
+        // endforeach;
 
         return Response::json($meals);
    }
@@ -95,17 +95,19 @@ class MealController extends Controller
    
    public function store(Request $request)
    {
-    $userTypeId = Auth::user()->userstype_id;
-        if($userTypeId == 1):
-            $userId = Auth::user()->id;
-            $meal = $request->isMethod('put') ? Meal::findOrFail($request->meal_id) : new Meal;
+        $user = Auth::user();
+        $input = $request->all();
+        if($user->userstype_id == 1):
+            if($request->isMethod('put')):
+                $meal = Meal::findOrFail($input['meal_id']);
+                $meal->name = $input['name'];
 
-            $meal->id = $request->input('meal_id');
-            $meal->name = $request->input('name');
-            $meal->picture = $request->input('picture');
-            $meal->user_id = $userId;
-
-            if($meal->save()):
+                if($meal->save()):
+                    return new MealR($meal);
+                endif;
+            else:
+                $input["user_id"] = $user->id;
+                $meal = Meal::create($input);
                 return new MealR($meal);
             endif;
         else: 
