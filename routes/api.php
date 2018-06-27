@@ -71,6 +71,10 @@ Route::group(['middleware' => 'auth:api'], function(){
     Route::get('/orders','OrderController@all');
     // Liste mes commandes
     Route::get('/myOrders','OrderController@myOrders');
+    // Liste mes commandes
+    Route::get('/myOrders/traiteur','OrderController@traiteurMyOrders');
+    // list one order
+    Route::get('/myOrdersFrom/traiteur/{dd}-{mm}-{yyyy}','OrderController@traiteurMyOrdersFrom');
     // list one order
     Route::get('/order/{orderId}','OrderController@show');
     // create order

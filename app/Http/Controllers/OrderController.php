@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Auth; 
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\Order as OrderR;
+use Carbon;
 
 class OrderController extends Controller
 {
@@ -51,31 +52,76 @@ class OrderController extends Controller
     public function myOrders()
     {
         $userId = Auth::User()->id;
-        // dd($userId);
 
         $orders = Order::select('id','name','user_id','menu_id', 'quantity')
                         ->where('orders.user_id' , '=' , $userId)
                         ->paginate(25);
 
         foreach ($orders as $key=>$order):
-        $user = User::where('id','=',$order->user_id)
-                    ->select('fname as FirstName', 'lname as LastName')->get();
-        $orders[$key]->user = $user;
+            $user = User::where('id','=',$order->user_id)
+                        ->select('fname as FirstName', 'lname as LastName')->get();
+            $orders[$key]->user = $user;
         endforeach;
         
-        
-
         foreach ($orders as $key=>$order):
             $menu = Menu::select('meals.name','meal_id')
             ->join('meals', 'meals.id', 'menus.meal_id')
             ->where('menus.id','=',$order->menu_id)
             ->get();
+            
             $orders[$key]->menu = $menu;
         endforeach;
-            
-
+        
         return Response::json($orders);
-       
+    }
+
+    public function traiteurMyOrders()
+    {
+        $user = Auth::User();
+        
+        if($user->userstype_id == 1):
+            $meals = Meal::select('meals.id','meals.name','meals.picture','menus.orders')
+                ->join('menus','menus.meal_id','meals.id')
+                ->where([
+                    ['menus.user_id','=',$user->id],
+                    ['menus.orders','!=',0]
+                ])
+                ->get();
+
+            return Response::json($meals);
+        else:
+            return Response::json(['error'=>'accès non autorisée']);
+        endif;
+    }
+
+    public function traiteurMyOrdersFrom($dd, $mm, $yyyy)
+    {
+        $user = Auth::User();
+        // date
+        $fromDate = Carbon::createFromDate($yyyy, $mm, $dd);
+        // dd($fromDate);
+        $stringFromDate = Carbon::Parse($fromDate)->format('Y-m-d');
+        // dd($stringFromDate);
+        $fromDateAddDay = $fromDate->addDay(4);
+        $stringFromDateAdd = Carbon::Parse($fromDateAddDay)->format('Y-m-d');
+        // dd($stringFromDateAdd);
+
+        $checkMonday = date('N',strtotime($stringFromDate));
+
+        if($user->userstype_id == 1):
+            $meals = Meal::select('meals.id','meals.name','meals.picture','menus.orders')
+                ->join('menus','menus.meal_id','meals.id')
+                ->where([
+                    ['menus.user_id','=',$user->id],
+                    ['menus.orders','!=',0]
+                ])
+                ->whereBetween('menus.date', array($stringFromDate, $stringFromDateAdd))
+                ->get();
+
+            return Response::json($meals);
+        else:
+            return Response::json(['error'=>'accès non autorisée']);
+        endif;
     }
 
     public function show($orderId)
